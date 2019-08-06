@@ -47,8 +47,7 @@ class _MyAppState extends State<MyApp> {
 
   void showDocument() async {
     try {
-      final ByteData bytes =
-          await DefaultAssetBundle.of(context).load(_documentPath);
+      final ByteData bytes = await DefaultAssetBundle.of(context).load(_documentPath);
       final Uint8List list = bytes.buffer.asUint8List();
 
       final tempDir = await getTemporaryDirectory();
@@ -66,7 +65,7 @@ class _MyAppState extends State<MyApp> {
   void showImage() async {
     try {
       final ByteData bytes =
-          await DefaultAssetBundle.of(context).load(_imagePath);
+      await DefaultAssetBundle.of(context).load(_imagePath);
       final Uint8List list = bytes.buffer.asUint8List();
 
       final tempDir = await getTemporaryDirectory();
@@ -83,8 +82,7 @@ class _MyAppState extends State<MyApp> {
 
   void applyDarkTheme() async {
     try {
-      final ByteData bytes =
-          await DefaultAssetBundle.of(context).load(_documentPath);
+      final ByteData bytes = await DefaultAssetBundle.of(context).load(_documentPath);
       final Uint8List list = bytes.buffer.asUint8List();
 
       final tempDir = await getTemporaryDirectory();
@@ -104,8 +102,7 @@ class _MyAppState extends State<MyApp> {
 
   void applyCustomConfiguration() async {
     try {
-      final ByteData bytes =
-          await DefaultAssetBundle.of(context).load(_documentPath);
+      final ByteData bytes = await DefaultAssetBundle.of(context).load(_documentPath);
       final Uint8List list = bytes.buffer.asUint8List();
 
       final tempDir = await getTemporaryDirectory();
@@ -156,8 +153,7 @@ class _MyAppState extends State<MyApp> {
 
   void unlockPasswordProtectedDocument() async {
     try {
-      final ByteData bytes =
-          await DefaultAssetBundle.of(context).load(_lockedDocumentPath);
+      final ByteData bytes = await DefaultAssetBundle.of(context).load(_lockedDocumentPath);
       final Uint8List list = bytes.buffer.asUint8List();
 
       final tempDir = await getTemporaryDirectory();
@@ -176,8 +172,7 @@ class _MyAppState extends State<MyApp> {
 
   void showFormDocumentExample() async {
     try {
-      final ByteData bytes =
-          await DefaultAssetBundle.of(context).load(_formPath);
+      final ByteData bytes = await DefaultAssetBundle.of(context).load(_formPath);
       final Uint8List list = bytes.buffer.asUint8List();
 
       final tempDir = await getTemporaryDirectory();
@@ -187,6 +182,10 @@ class _MyAppState extends State<MyApp> {
       file.writeAsBytesSync(list);
 
       Pspdfkit.present(tempDocumentPath);
+
+    } on PlatformException catch (e) {
+      print("Failed to open document: '${e.message}'.");
+    }
 
       Pspdfkit.setFormFieldValue("Lastname", "Name_Last");
       Pspdfkit.setFormFieldValue("0123456789", "Telephone_Home");
@@ -199,17 +198,17 @@ class _MyAppState extends State<MyApp> {
       // Platform messages may fail, so we use a try/catch PlatformException.
       try {
         lastName = (await Pspdfkit.getFormFieldValue("Name_Last")) as String;
-      } on PlatformException {
-        lastName = 'Failed to get last name.';
+      } on PlatformException catch (e) {
+        print("Failed to get last name: '${e.message}'.");
       }
 
-      print(lastName);
-
-    } on PlatformException catch (e) {
-      print("Failed to open document: '${e.message}'.");
-    }
+      if (lastName != null && lastName.isNotEmpty) {
+        print("Retrieved form field for fully qualified name \"Name_Last\" is $lastName.");
+      } else {
+        print("Form field for fully qualified name \"Name_Last\" not found.");
+      }
   }
-  
+
   @override
   initState() {
     super.initState();
@@ -238,7 +237,7 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _frameworkVersion = frameworkVersion;
     });
-    
+
     Pspdfkit.setLicenseKey("LICENSE_KEY_GOES_HERE");
   }
 
