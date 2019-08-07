@@ -171,42 +171,48 @@ class _MyAppState extends State<MyApp> {
   }
 
   void showFormDocumentExample() async {
+    final ByteData bytes = await DefaultAssetBundle.of(context).load(_formPath);
+    final Uint8List list = bytes.buffer.asUint8List();
+
+    final tempDir = await getTemporaryDirectory();
+    final tempDocumentPath = '${tempDir.path}/$_formPath';
+
+    final file = await File(tempDocumentPath).create(recursive: true);
+    file.writeAsBytesSync(list);
+
+    PdfDocument document;
     try {
-      final ByteData bytes = await DefaultAssetBundle.of(context).load(_formPath);
-      final Uint8List list = bytes.buffer.asUint8List();
-
-      final tempDir = await getTemporaryDirectory();
-      final tempDocumentPath = '${tempDir.path}/$_formPath';
-
-      final file = await File(tempDocumentPath).create(recursive: true);
-      file.writeAsBytesSync(list);
-
-      Pspdfkit.present(tempDocumentPath);
-
+      document = await Pspdfkit.open(tempDocumentPath);
     } on PlatformException catch (e) {
       print("Failed to open document: '${e.message}'.");
     }
+    document.setFormFieldValue("Lastname", "Name_Last");
+    document.setFormFieldValue("0123456789", "Telephone_Home");
+    document.setFormFieldValue("City", "City");
+    document.setFormFieldValue("selected", "Sex.0");
+    document.setFormFieldValue("deselected", "Sex.1");
+    document.setFormFieldValue("selected", "HIGH SCHOOL DIPLOMA");
 
-      Pspdfkit.setFormFieldValue("Lastname", "Name_Last");
-      Pspdfkit.setFormFieldValue("0123456789", "Telephone_Home");
-      Pspdfkit.setFormFieldValue("City", "City");
-      Pspdfkit.setFormFieldValue("selected", "Sex.0");
-      Pspdfkit.setFormFieldValue("deselected", "Sex.1");
-      Pspdfkit.setFormFieldValue("selected", "HIGH SCHOOL DIPLOMA");
+    String lastName;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      lastName = (await document.getFormFieldValue("Name_Last")) as String;
+    } on PlatformException catch (e) {
+      print("Failed to get last name: '${e.message}'.");
+    }
 
-      String lastName;
-      // Platform messages may fail, so we use a try/catch PlatformException.
-      try {
-        lastName = (await Pspdfkit.getFormFieldValue("Name_Last")) as String;
-      } on PlatformException catch (e) {
-        print("Failed to get last name: '${e.message}'.");
-      }
+    if (lastName != null) {
+      print(
+          "Retrieved form field for fully qualified name \"Name_Last\" is $lastName.");
+    } else {
+      print("Form field for fully qualified name \"Name_Last\" not found.");
+    }
 
-      if (lastName != null && lastName.isNotEmpty) {
-        print("Retrieved form field for fully qualified name \"Name_Last\" is $lastName.");
-      } else {
-        print("Form field for fully qualified name \"Name_Last\" not found.");
-      }
+    try {
+      Pspdfkit.present(tempDocumentPath);
+    } on PlatformException catch(e) {
+      print("Failed to load document: '${e.message}'.");
+    }
   }
 
   @override

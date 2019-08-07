@@ -14,33 +14,36 @@ import 'package:flutter/services.dart';
 
 part 'android_permission_status.dart';
 part 'configuration_options.dart';
+part 'pdf_document.dart';
 
 /// PSPDFKit plugin to load PDF and image documents on both platform iOS and Android.
 class Pspdfkit {
   static const MethodChannel _channel = const MethodChannel('pspdfkit');
 
   /// Gets the PSPDFKit framework version.
-  static Future<dynamic> get frameworkVersion =>
-      _channel.invokeMethod('frameworkVersion');
+  static Future<String> get frameworkVersion async =>
+      await _channel.invokeMethod('frameworkVersion');
 
   /// Sets the license key.
-  static Future<void> setLicenseKey(String licenseKey) =>
-    _channel.invokeMethod('setLicenseKey', <String, dynamic>{'licenseKey': licenseKey});
+  static Future<void> setLicenseKey(String licenseKey) async =>
+    await _channel.invokeMethod('setLicenseKey', <String, String>{'licenseKey': licenseKey});
 
   /// Loads a [document] with a supported format using a given [configuration].
-  static Future<void> present(String document, [dynamic configuration]) =>
-    _channel.invokeMethod(
+  static Future<void> present(String document, [dynamic configuration]) async {
+    await _channel.invokeMethod(
         'present',
         <String, dynamic>{'document': document, 'configuration': configuration}
-        );
+    );
+  }
 
-  /// Sets the value of a form field by specifying its fully qualified field name.
-  static Future<void> setFormFieldValue(String value, String fullyQualifiedName) =>
-    _channel.invokeMethod('setFormFieldValue', <String, dynamic>{'value': value, 'fullyQualifiedName': fullyQualifiedName});
-
-  /// Gets the form field value by specifying its fully qualified name.
-  static Future<dynamic> getFormFieldValue(String fullyQualifiedName) =>
-    _channel.invokeMethod('getFormFieldValue', <String, dynamic>{'fullyQualifiedName': fullyQualifiedName});
+  /// Opens a [document] with a supported format and returns [PdfDocument].
+  static Future<PdfDocument> open(String document) async {
+    await _channel.invokeMethod(
+        'open',
+        {'document': document}
+    );
+    return new PdfDocument._(_channel, document);
+  }
 
   /// Checks the external storage permission for writing on Android only.
   static Future<bool> checkAndroidWriteExternalStoragePermission() async {
@@ -62,9 +65,8 @@ class Pspdfkit {
   }
 
   /// Opens the Android settings.
-  static Future<bool> openAndroidSettings() async {
-    final bool isOpen = await _channel.invokeMethod("openSettings");
-    return isOpen;
+  static Future<void> openAndroidSettings() async {
+    await _channel.invokeMethod("openSettings");
   }
 
   static AndroidPermissionStatus _intToAndroidPermissionStatus(int status) {

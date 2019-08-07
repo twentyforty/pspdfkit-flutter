@@ -18,12 +18,19 @@ import android.provider.Settings;
 import android.util.Log;
 
 import com.pspdfkit.PSPDFKit;
+import com.pspdfkit.document.PdfDocument;
+import com.pspdfkit.document.PdfDocumentLoader;
+import com.pspdfkit.forms.RadioButtonFormField;
+import com.pspdfkit.forms.TextFormElement;
+import com.pspdfkit.forms.TextFormField;
 import com.pspdfkit.ui.PdfActivity;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -44,10 +51,11 @@ public class PspdfkitPlugin implements MethodCallHandler, PluginRegistry.Request
     private static final String FILE_SCHEME = "file:///";
     private final Context context;
     private final Registrar registrar;
-    /** Atomic reference that prevents sending twice the permission result and throw exception. */
+    /** Atomic reference that prevents sending twice the permission result and throwing exception. */
     private AtomicReference<Result> permissionRequestResult;
+    @Nullable private PdfDocument document;
 
-    public PspdfkitPlugin(Registrar registrar) {
+    private PspdfkitPlugin(Registrar registrar) {
         this.context = registrar.activeContext();
         this.registrar = registrar;
         this.permissionRequestResult = new AtomicReference<>();
@@ -66,6 +74,7 @@ public class PspdfkitPlugin implements MethodCallHandler, PluginRegistry.Request
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         String permission;
+        String documentPath;
 
         switch (call.method) {
             case "frameworkVersion":
@@ -76,18 +85,24 @@ public class PspdfkitPlugin implements MethodCallHandler, PluginRegistry.Request
                 requireNotNullNotEmpty(licenseKey, "License key");
                 PSPDFKit.initialize(context, licenseKey);
                 break;
+            case "open":
+                documentPath = call.argument("document");
+                requireNotNullNotEmpty(documentPath, "Document path");
+
+                documentPath = addFileSchemeIfMissing(documentPath);
+                try {
+                    document = PdfDocumentLoader.openDocument(context, Uri.parse(documentPath));
+                } catch (IOException e) {
+                    result.error(LOG_TAG, String.format("Error while opening document %s:", documentPath), e.getMessage());
+                }
+                break;
             case "present":
-                String documentPath = call.argument("document");
+                documentPath = call.argument("document");
                 requireNotNullNotEmpty(documentPath, "Document path");
 
                 HashMap<String, Object> configurationMap = call.argument("configuration");
                 ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(context, configurationMap);
-                if (Uri.parse(documentPath).getScheme() == null) {
-                    if (documentPath.startsWith("/")) {
-                        documentPath = documentPath.substring(1);
-                    }
-                    documentPath = FILE_SCHEME + documentPath;
-                }
+                documentPath = addFileSchemeIfMissing(documentPath);
                 boolean imageDocument = isImageDocument(documentPath);
                 if (imageDocument) {
                     PdfActivity.showImage(context, Uri.parse(documentPath), configurationAdapter.build());
@@ -108,10 +123,39 @@ public class PspdfkitPlugin implements MethodCallHandler, PluginRegistry.Request
                 openSettings();
                 result.success(true);
                 break;
+            case "setFormFieldValue":
+                String value = call.argument("value");
+                String fullyQualifiedName = call.argument("fullyQualifiedName");
+
+                requireNotNullNotEmpty(value, "Value");
+                requireNotNullNotEmpty(fullyQualifiedName, "Fully qualified name");
+                if (document == null) {
+                    throw new IllegalStateException("Document may not be null");
+                }
+
+                //noinspection ResultOfMethodCallIgnored
+                document.getFormProvider()
+                        .getFormElementWithNameAsync(fullyQualifiedName)
+                        .subscribe(formElement -> {
+                            if (formElement instanceof TextFormElement) {
+                                ((TextFormElement) formElement).setText(value);
+                            }
+                });
+                break;
             default:
                 result.notImplemented();
                 break;
         }
+    }
+
+    private String addFileSchemeIfMissing(String documentPath) {
+        if (Uri.parse(documentPath).getScheme() == null) {
+            if (documentPath.startsWith("/")) {
+                documentPath = documentPath.substring(1);
+            }
+            documentPath = FILE_SCHEME + documentPath;
+        }
+        return documentPath;
     }
 
     private void requestPermission(String permission) {
