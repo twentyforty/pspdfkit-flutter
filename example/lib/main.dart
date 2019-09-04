@@ -58,7 +58,7 @@ class _MyAppState extends State<MyApp> {
 
       Pspdfkit.present(tempDocumentPath);
     } on PlatformException catch (e) {
-      print("Failed to open document: '${e.message}'.");
+      print("Failed to present document: '${e.message}'.");
     }
   }
 
@@ -76,7 +76,7 @@ class _MyAppState extends State<MyApp> {
 
       Pspdfkit.present(tempDocumentPath);
     } on PlatformException catch (e) {
-      print("Failed to open document: '${e.message}'.");
+      print("Failed to present document: '${e.message}'.");
     }
   }
 
@@ -96,7 +96,7 @@ class _MyAppState extends State<MyApp> {
         androidDarkThemeResource: 'PSPDFKit.Theme.Example.Dark'
       });
     } on PlatformException catch (e) {
-      print("Failed to open document: '${e.message}'.");
+      print("Failed to present document: '${e.message}'.");
     }
   }
 
@@ -147,7 +147,7 @@ class _MyAppState extends State<MyApp> {
         iOSShowActionNavigationButtonLabels: false
       });
     } on PlatformException catch (e) {
-      print("Failed to open document: '${e.message}'.");
+      print("Failed to present document: '${e.message}'.");
     }
   }
 
@@ -166,7 +166,7 @@ class _MyAppState extends State<MyApp> {
         password: 'test123'
       });
     } on PlatformException catch (e) {
-      print("Failed to open document: '${e.message}'.");
+      print("Failed to present document: '${e.message}'.");
     }
   }
 
@@ -180,38 +180,32 @@ class _MyAppState extends State<MyApp> {
     final file = await File(tempDocumentPath).create(recursive: true);
     file.writeAsBytesSync(list);
 
-    PdfDocument document;
     try {
-      document = await Pspdfkit.open(tempDocumentPath);
-    } on PlatformException catch (e) {
-      print("Failed to open document: '${e.message}'.");
+      await Pspdfkit.present(tempDocumentPath);
+    } on PlatformException catch(e) {
+      print("Failed to present document: '${e.message}'.");
     }
-    document.setFormFieldValue("Lastname", "Name_Last");
-    document.setFormFieldValue("0123456789", "Telephone_Home");
-    document.setFormFieldValue("City", "City");
-    document.setFormFieldValue("selected", "Sex.0");
-    document.setFormFieldValue("deselected", "Sex.1");
-    document.setFormFieldValue("selected", "HIGH SCHOOL DIPLOMA");
+
+    try {
+      Pspdfkit.setFormFieldValue("Lastname", "Name_Last");
+      Pspdfkit.setFormFieldValue("0123456789", "Telephone_Home");
+      Pspdfkit.setFormFieldValue("City", "City");
+      Pspdfkit.setFormFieldValue("selected", "Sex.0");
+      Pspdfkit.setFormFieldValue("deselected", "Sex.1");
+      Pspdfkit.setFormFieldValue("selected", "HIGH SCHOOL DIPLOMA");
+    } on PlatformException catch(e) {
+      print("Failed to set form field values '${e.message}'.");
+    }
 
     String lastName;
-    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      lastName = (await document.getFormFieldValue("Name_Last")) as String;
-    } on PlatformException catch (e) {
-      print("Failed to get last name: '${e.message}'.");
+      lastName = await Pspdfkit.getFormFieldValue("Name_Last");
+    } on PlatformException catch(e) {
+      print("Failed to get form field value '${e.message}'.");
     }
 
     if (lastName != null) {
-      print(
-          "Retrieved form field for fully qualified name \"Name_Last\" is $lastName.");
-    } else {
-      print("Form field for fully qualified name \"Name_Last\" not found.");
-    }
-
-    try {
-      Pspdfkit.present(tempDocumentPath);
-    } on PlatformException catch(e) {
-      print("Failed to load document: '${e.message}'.");
+      print("Retrieved form field for fully qualified name \"Name_Last\" is $lastName.");
     }
   }
 
@@ -230,7 +224,7 @@ class _MyAppState extends State<MyApp> {
     String frameworkVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      frameworkVersion = (await Pspdfkit.frameworkVersion) as String;
+      frameworkVersion = await Pspdfkit.frameworkVersion;
     } on PlatformException {
       frameworkVersion = 'Failed to get platform version. ';
     }
