@@ -64,6 +64,7 @@ target 'Runner' do
 
   # Plugin Pods
   pod 'PSPDFKit', podspec:'https://customers.pspdfkit.com/pspdfkit-ios/latest-framework.podspec'
+  pod 'Instant', podspec:'https://customers.pspdfkit.com/instant/latest-framework.podspec'
 
   # Prepare symlinks folder. We use symlinks to avoid having Podfile.lock
   # referring to absolute paths on developers' machines.

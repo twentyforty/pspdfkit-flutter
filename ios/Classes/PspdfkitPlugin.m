@@ -7,6 +7,7 @@
 //  This notice may not be removed from this file.
 //
 #import "PspdfkitPlugin.h"
+#import <pspdfkit_flutter/pspdfkit_flutter-Swift.h>
 
 @import PSPDFKit;
 @import PSPDFKitUI;
@@ -96,6 +97,13 @@
         }
 
         UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:self.pdfViewController];
+        navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
+        UIViewController *presentingViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+        [presentingViewController presentViewController:navigationController animated:YES completion:nil];
+        result(@(YES));
+    } else if ([@"presentInstantExample" isEqualToString:call.method]) {
+        InstantExampleViewController *vc = [[InstantExampleViewController alloc] init];
+        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:vc];
         navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
         UIViewController *presentingViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
         [presentingViewController presentViewController:navigationController animated:YES completion:nil];
