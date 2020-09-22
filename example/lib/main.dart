@@ -36,6 +36,8 @@ const String _formExample = 'Programmatic Form Filling Example';
 const String _formExampleSub = 'Programmatically set and get the value of a form field.';
 const String _importInstantJsonExample = 'Import Instant Document JSON';
 const String _importInstantJsonExampleSub = 'Shows how to programmatically import Instant Document JSON.';
+const String _instantExample = 'Instant Example';
+const String _instantExampleSub = 'This example connects to our public PSPDFKit for Web examples server and downloads documents using PSPDFKit Instant. You can then collaboratively annotate these documents using Instant.';
 const String _pspdfkitFor = 'PSPDFKit for';
 const double _fontSize = 21.0;
 
@@ -80,6 +82,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final File file = await File(tempDocumentPath).create(recursive: true);
     file.writeAsBytesSync(list);
     return file;
+  }
+
+  void showInstantExample() async {
+    try {
+      Pspdfkit.presentInstantExample();
+    } on PlatformException catch (e) {
+      print("Failed to present Instant Example: '${e.message}'.");
+    }
   }
 
   void showDocument() async {
@@ -278,6 +288,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       var padding = EdgeInsets.all(16.0);
 
       List<Widget> cupertinoListTiles = <Widget>[
+        GestureDetector(
+          onTap: showInstantExample,
+          child: Container(
+              color: currentTheme.backgroundColor,
+              padding: padding,
+              child: Column(crossAxisAlignment: crossAxisAlignment, children: [
+                Text(_instantExample, style: title),
+                Text(_instantExampleSub, style: subhead)
+              ])),
+        ),
+        Divider(),
         GestureDetector(
           onTap: showDocument,
           child: Container(

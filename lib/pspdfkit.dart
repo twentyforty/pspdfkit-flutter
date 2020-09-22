@@ -35,6 +35,10 @@ class Pspdfkit {
     );
   }
 
+  /// Shows the Instant Example.
+  static Future<bool> presentInstantExample() async =>
+    _channel.invokeMethod('presentInstantExample');
+
   /// Sets the value of a form field by specifying its fully qualified field name.
   static Future<bool> setFormFieldValue(String value, String fullyQualifiedName) async =>
       _channel.invokeMethod('setFormFieldValue', <String, dynamic>{'value': value, 'fullyQualifiedName': fullyQualifiedName});
