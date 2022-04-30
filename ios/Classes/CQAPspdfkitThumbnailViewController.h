@@ -1,6 +1,7 @@
 @import PSPDFKit;
 @import PSPDFKitUI;
+@import UIKit;
 
-@interface CQAPspdfkitThumbnailViewController : PSPDFThumbnailViewController
+@interface CQAPspdfkitThumbnailViewController : UIViewController
 
 @end

@@ -8,6 +8,7 @@
 //
 #import "PspdfkitFlutterHelper.h"
 #import "PspdfkitFlutterConverter.h"
+#import "PspdfkitPlugin.h"
 
 @implementation PspdfkitFlutterHelper
 
@@ -116,6 +117,7 @@
     }
 }
 
+
 + (BOOL)isImageDocument:(NSString *)path {
     NSString *fileExtension = path.pathExtension.lowercaseString;
     return [fileExtension isEqualToString:@"png"] || [fileExtension isEqualToString:@"jpeg"] || [fileExtension isEqualToString:@"jpg"] || [fileExtension isEqualToString:@"tiff"] || [fileExtension isEqualToString:@"tif"];
@@ -196,9 +198,9 @@
 }
 
 + (void)setLeftBarButtonItems:(nullable NSArray <NSString *> *)items forViewController:(PSPDFViewController *)pdfViewController {
-    if ((id)items == NSNull.null || !items || items.count == 0) {
-        return;
-    }
+    // if ((id)items == NSNull.null || !items || items.count == 0) {
+    //     return;
+    // }
     NSMutableArray *leftItems = [NSMutableArray array];
     for (NSString *barButtonItemString in items) {
         UIBarButtonItem *barButtonItem = [self barButtonItemFromString:barButtonItemString forViewController:pdfViewController];
@@ -211,9 +213,9 @@
 }
 
 + (void)setRightBarButtonItems:(nullable NSArray <NSString *> *)items forViewController:(PSPDFViewController *)pdfViewController {
-    if ((id)items == NSNull.null || !items || items.count == 0) {
-        return;
-    }
+    // if ((id)items == NSNull.null || !items || items.count == 0) {
+    //     return;
+    // }
     NSMutableArray *rightItems = [NSMutableArray array];
     for (NSString *barButtonItemString in items) {
         UIBarButtonItem *barButtonItem = [PspdfkitFlutterHelper barButtonItemFromString:barButtonItemString forViewController:pdfViewController];

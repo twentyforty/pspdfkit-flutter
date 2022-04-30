@@ -9,4 +9,9 @@
 #import <Flutter/Flutter.h>
 
 @interface PspdfkitPlugin : NSObject<FlutterPlugin>
+
+// Annotation notifications
++ (void)userAnnotationAdded;
++ (void)userAnnotationRemoved;
++ (void)userAnnotationChanged;
 @end

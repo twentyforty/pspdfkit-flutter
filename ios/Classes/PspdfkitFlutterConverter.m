@@ -52,12 +52,25 @@
 
         // Document Interaction Options
 
+        // builder.additionalContentInsets = UIEdgeInsetsMake(20, 0, 100, 0);
+        // builder.additionalScrollViewFrameInsets = UIEdgeInsetsMake(30, 0, 0, 0);
+        // builder.shadowEnabled = YES;
+        // builder.shadowOpacity = 1.0;
+        builder.bookmarkIndicatorMode = PSPDFPageBookmarkIndicatorModeOff;
+        builder.allowedMenuActions = PSPDFTextSelectionMenuActionCopy;
+        builder.shouldAskForAnnotationUsername = NO;
+        builder.pageTransition = PSPDFPageTransitionScrollContinuous;
+        builder.autosaveEnabled = YES;
+        builder.userInterfaceViewMode = PSPDFUserInterfaceViewModeNever;
+        NSMutableDictionary *annotationProperties = [builder.propertiesForAnnotations mutableCopy];
+        annotationProperties[PSPDFAnnotationStringInk] = @[@[PSPDFAnnotationStyleKeyLineWidth, PSPDFAnnotationStyleKeyColor]];
+        annotationProperties[PSPDFAnnotationStringHighlight] = @[@[PSPDFAnnotationStyleKeyColor]];
+        builder.propertiesForAnnotations = annotationProperties;
+
         key = @"scrollDirection";
         if (dictionary[key]) {
             builder.scrollDirection = [dictionary[key] isEqualToString: @"vertical"] ? PSPDFScrollDirectionVertical : PSPDFScrollDirectionHorizontal;
         }
-
-        builder.shouldAskForAnnotationUsername = NO;
 
         key = @"pageTransition";
         if (dictionary[key]) {
@@ -152,10 +165,11 @@
             builder.scrollDirection = [dictionary[key] isEqualToString: @"vertical"] ? PSPDFScrollDirectionVertical : PSPDFScrollDirectionHorizontal;
         }
 
-        key = @"scrollContinuously";
-        if (dictionary[key]) {
-            builder.pageTransition = [dictionary[key] boolValue] ? PSPDFPageTransitionScrollContinuous : PSPDFPageTransitionScrollPerSpread;
-        }
+        // key = @"scrollContinuously";
+        // if (dictionary[key]) {
+        //     builder.pageTransition = [dictionary[key] boolValue] ? PSPDFPageTransitionScrollContinuous : PSPDFPageTransitionScrollPerSpread;
+        // }
+
 
         key = @"pageLayoutMode";
         if (dictionary[key]) {

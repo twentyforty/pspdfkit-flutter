@@ -77,7 +77,18 @@ class PspdfkitWidgetController {
   Future<bool?> exportXfdf(String xfdfPath) async => _channel
       .invokeMethod('exportXfdf', <String, String>{'xfdfPath': xfdfPath});
 
-  /// Saves the document back to its original location if it has been changed.
+  Future<bool?> showAnnotationBar() async =>
+      _channel.invokeMethod('showAnnotationBar');
+
+  Future<bool?> hideAnnotationBar() async =>
+      _channel.invokeMethod('hideAnnotationBar');
+
+  Future<bool?> showGallery() async => _channel.invokeMethod('showGallery');
+
+  Future<bool?> hideGallery() async => _channel.invokeMethod('hideGallery');
+
+  /// Saves the document back to its original loc
+  /// ation if it has been changed.
   /// If there were no changes to the document, the document file will not be modified.
   Future<bool?> save() async => _channel.invokeMethod('save');
 }

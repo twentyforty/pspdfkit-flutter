@@ -11,7 +11,7 @@
 #import "PspdfkitFlutterHelper.h"
 #import "PspdfkitFlutterConverter.h"
 #import "PspdfkitCustomButtonAnnotationToolbar.h"
-#import "CQAPspdfkitThumbnailViewController.h"
+
 
 @import PSPDFKit;
 @import PSPDFKitUI;
@@ -44,73 +44,6 @@ PSPDFSettingKey const PSPDFSettingKeyHybridEnvironment = @"com.pspdfkit.hybrid-e
     } else if ([@"setLicenseKeys" isEqualToString:call.method]) {
         NSString *iOSLicenseKey = call.arguments[@"iOSLicenseKey"];
         [PSPDFKitGlobal setLicenseKey:iOSLicenseKey options:@{PSPDFSettingKeyHybridEnvironment: @"Flutter"}];
-    }else if ([@"present" isEqualToString:call.method]) {
-        NSString *documentPath = call.arguments[@"document"];
-
-        if (documentPath == nil || documentPath.length <= 0) {
-            FlutterError *error = [FlutterError errorWithCode:@"" message:@"Document path may not be nil or empty." details:nil];
-            result(error);
-            return;
-        }
-
-        // UIImage* (^imageLoadingHandler)(NSString*) = ^UIImage*(NSString *imageKey) {
-        //     return [UIImage systemImageNamed:@"multiply.circle.fill"];
-        // };
-        // PSPDFKitGlobal.sharedInstance.imageLoadingHandler = imageLoadingHandler;//imageLoadingHandler;
-
-        NSDictionary *configurationDictionary = [PspdfkitFlutterConverter processConfigurationOptionsDictionaryForPrefix:call.arguments[@"configuration"]];
-
-        PSPDFDocument *document = [PspdfkitFlutterHelper documentFromPath:documentPath];
-        [PspdfkitFlutterHelper unlockWithPasswordIfNeeded:document dictionary:configurationDictionary];
-
-        BOOL isImageDocument = [PspdfkitFlutterHelper isImageDocument:documentPath];
-        PSPDFConfiguration *configuration = [PspdfkitFlutterConverter configuration:configurationDictionary isImageDocument:isImageDocument];
-
-        // Update the configuration to override the default class with our custom one.
-        configuration = [configuration configurationUpdatedWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
-            [builder overrideClass:PSPDFAnnotationToolbar.class withClass:PspdfkitCustomButtonAnnotationToolbar.class];
-            [builder overrideClass:PSPDFThumbnailViewController.class withClass:CQAPspdfkitThumbnailViewController.class];
-        }];
-
-        self.pdfViewController = [[PSPDFViewController alloc] initWithDocument:document configuration:configuration];
-        self.pdfViewController.appearanceModeManager.appearanceMode = [PspdfkitFlutterConverter appearanceMode:configurationDictionary];
-        self.pdfViewController.pageIndex = [PspdfkitFlutterConverter pageIndex:configurationDictionary];
-        self.pdfViewController.delegate = self;
-
-        if ((id)configurationDictionary != NSNull.null) {
-            NSString *key;
-
-            key = @"leftBarButtonItems";
-            if (configurationDictionary[key]) {
-                [PspdfkitFlutterHelper setLeftBarButtonItems:configurationDictionary[key] forViewController:self.pdfViewController];
-            }
-            key = @"rightBarButtonItems";
-            if (configurationDictionary[key]) {
-                [PspdfkitFlutterHelper setRightBarButtonItems:configurationDictionary[key] forViewController:self.pdfViewController];
-            }
-            key = @"invertColors";
-            if (configurationDictionary[key]) {
-                self.pdfViewController.appearanceModeManager.appearanceMode = [configurationDictionary[key] boolValue] ? PSPDFAppearanceModeNight : PSPDFAppearanceModeDefault;
-            }
-            key = @"toolbarTitle";
-            if (configurationDictionary[key]) {
-                [PspdfkitFlutterHelper setToolbarTitle:configurationDictionary[key] forViewController:self.pdfViewController];
-            }
-        }
-
-        PSPDFNavigationController *navigationController = [[PSPDFNavigationController alloc] initWithRootViewController:self.pdfViewController];
-        
-        navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
-        UIViewController *presentingViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-        [presentingViewController presentViewController:navigationController animated:YES completion:nil];
-        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(spreadIndexDidChange:) name:PSPDFDocumentViewControllerSpreadIndexDidChangeNotification object:nil];
-
-        navigationController.navigationBar.standardAppearance = [[UINavigationBarAppearance alloc] init];
-        [navigationController.navigationBar.standardAppearance configureWithDefaultBackground];
-        navigationController.navigationBar.standardAppearance.backgroundColor = [UIColor colorWithRed:91.0/255.0 green:129.0/255.0 blue:74.0/255.0 alpha:1.0];
-        navigationController.navigationBar.standardAppearance.shadowColor = nil;
-
-        result(@(YES));
     } else if ([@"getTemporaryDirectory" isEqualToString:call.method]) {
         result([self getTemporaryDirectory]);
     } else {
@@ -119,8 +52,8 @@ PSPDFSettingKey const PSPDFSettingKeyHybridEnvironment = @"com.pspdfkit.hybrid-e
 }
 
 - (NSString*)getTemporaryDirectory {
-  NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-  return paths.firstObject;
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    return paths.firstObject;
 }
 
 // MARK: - PSPDFViewControllerDelegate
@@ -142,4 +75,15 @@ PSPDFSettingKey const PSPDFSettingKeyHybridEnvironment = @"com.pspdfkit.hybrid-e
     [channel invokeMethod:@"spreadIndexDidChange" arguments:pageIndices];
 }
 
+# pragma mark - Annotation notifications
+
++ (void)userAnnotationAdded {
+    [channel invokeMethod:@"userAnnotationAdded" arguments:nil];
+}
++ (void)userAnnotationRemoved {
+    [channel invokeMethod:@"userAnnotationRemoved" arguments:nil];
+}
++ (void)userAnnotationChanged {
+    [channel invokeMethod:@"userAnnotationChanged" arguments:nil];
+}
 @end

@@ -9,9 +9,8 @@
 #import "PspdfPlatformView.h"
 #import "PspdfkitFlutterHelper.h"
 #import "PspdfkitFlutterConverter.h"
+#import "PspdfkitPlugin.h"
 #import "PspdfkitCustomButtonAnnotationToolbar.h"
-#import "CQAPspdfkitThumbnailViewController.h"
-
 @import PSPDFKit;
 @import PSPDFKitUI;
 
@@ -22,14 +21,20 @@
 @property (nonatomic, weak) UIViewController *flutterViewController;
 @property (nonatomic) PSPDFViewController *pdfViewController;
 @property (nonatomic) PSPDFNavigationController *navigationController;
+@property (nonatomic) id<NSObject> annotationsAddedObserver;
+@property (nonatomic) id<NSObject> annotationsRemovedObserver;
+@property (nonatomic) id<NSObject> annotationChangedObserver;
+@property (nonatomic) UIView* containerView;
 @end
 
 @implementation PspdfPlatformView
 
 - (nonnull UIView *)view {
-    UIView *view = self.navigationController.view ?: [UIView new];
-    view.tintColor = UIColor.whiteColor;
-    return view;
+    if (self.containerView == nil) {
+        self.containerView = self.navigationController.view ?: [UIView new];
+    }
+    
+    return self.containerView;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame viewIdentifier:(int64_t)viewId arguments:(id)args messenger:(NSObject<FlutterBinaryMessenger> *)messenger {
@@ -39,6 +44,15 @@
 
     _navigationController = [PSPDFNavigationController new];
     _navigationController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+    UINavigationBarAppearance* appearance = [[UINavigationBarAppearance alloc] init];
+    [appearance configureWithOpaqueBackground];
+    appearance.backgroundColor = [UIColor colorWithRed:91.0/255.0 green:129.0/255.0 blue:74.0/255.0 alpha:1.0];
+    appearance.shadowColor = nil;
+
+    _navigationController.navigationBar.standardAppearance = appearance;
+    _navigationController.navigationBar.scrollEdgeAppearance = appearance;
+    _navigationController.navigationBar.tintColor = UIColor.blackColor;
 
     // View controller containment
     _flutterViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
@@ -61,13 +75,10 @@
         // Update the configuration to override the default class with our custom one.
         configuration = [configuration configurationUpdatedWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
             [builder overrideClass:PSPDFAnnotationToolbar.class withClass:PspdfkitCustomButtonAnnotationToolbar.class];
-            [builder overrideClass:PSPDFThumbnailViewController.class withClass:CQAPspdfkitThumbnailViewController.class];
+            [builder overrideClass:PSPDFAnnotationToolbar.class withClass:PspdfkitCustomButtonAnnotationToolbar.class];
         }];
 
         _pdfViewController = [[PSPDFViewController alloc] initWithDocument:document configuration:configuration];
-        _pdfViewController.appearanceModeManager.appearanceMode = [PspdfkitFlutterConverter appearanceMode:configurationDictionary];
-        _pdfViewController.pageIndex = [PspdfkitFlutterConverter pageIndex:configurationDictionary];
-        _pdfViewController.delegate = self;
 
         if ((id)configurationDictionary != NSNull.null) {
             NSString *key;
@@ -80,15 +91,35 @@
             if (configurationDictionary[key]) {
                 [PspdfkitFlutterHelper setRightBarButtonItems:configurationDictionary[key] forViewController:_pdfViewController];
             }
-            key = @"invertColors";
-            if (configurationDictionary[key]) {
-                _pdfViewController.appearanceModeManager.appearanceMode = [configurationDictionary[key] boolValue] ? PSPDFAppearanceModeNight : PSPDFAppearanceModeDefault;
-            }
-            key = @"toolbarTitle";
-            if (configurationDictionary[key]) {
-                [PspdfkitFlutterHelper setToolbarTitle:configurationDictionary[key] forViewController:_pdfViewController];
-            }
         }
+
+        _pdfViewController.appearanceModeManager.appearanceMode = [PspdfkitFlutterConverter appearanceMode:configurationDictionary];
+        _pdfViewController.pageIndex = [PspdfkitFlutterConverter pageIndex:configurationDictionary];
+        _pdfViewController.delegate = self;
+        _pdfViewController.edgesForExtendedLayout = @[];
+
+        __weak id weakSelf = self;
+        self.annotationsAddedObserver = [[NSNotificationCenter defaultCenter] 
+            addObserverForName:PSPDFAnnotationsAddedNotification
+                        object:nil
+                         queue:nil
+                    usingBlock:^(NSNotification *notification) {
+            [PspdfkitPlugin userAnnotationAdded];
+        }];
+        self.annotationsRemovedObserver = [[NSNotificationCenter defaultCenter] 
+            addObserverForName:PSPDFAnnotationsRemovedNotification
+                        object:nil
+                         queue:nil
+                    usingBlock:^(NSNotification *notification) {
+            [PspdfkitPlugin userAnnotationRemoved];
+        }];
+        self.annotationChangedObserver = [[NSNotificationCenter defaultCenter] 
+            addObserverForName:PSPDFAnnotationChangedNotification
+                        object:nil
+                         queue:nil
+                    usingBlock:^(NSNotification *notification) {
+            [PspdfkitPlugin userAnnotationChanged];
+        }];
     } else {
         _pdfViewController = [[PSPDFViewController alloc] init];
     }
@@ -116,6 +147,9 @@
     [self.navigationController.navigationBar removeFromSuperview];
     [self.navigationController.view removeFromSuperview];
     [self.navigationController removeFromParentViewController];
+    [[NSNotificationCenter defaultCenter] removeObserver:self.annotationsAddedObserver];
+    [[NSNotificationCenter defaultCenter] removeObserver:self.annotationsRemovedObserver];
+    [[NSNotificationCenter defaultCenter] removeObserver:self.annotationChangedObserver];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {

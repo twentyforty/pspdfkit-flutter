@@ -26,10 +26,21 @@
             ]],
             
         ]]];
-        self.supportedToolbarPositions = PSPDFFlexibleToolbarPositionVertical;
+        self.standardAppearance = [[UIToolbarAppearance alloc] init];
+        [self.standardAppearance configureWithOpaqueBackground];
+        self.standardAppearance.backgroundColor = [UIColor colorWithRed:91.0/255.0 green:129.0/255.0 blue:74.0/255.0 alpha:1.0];
+        self.standardAppearance.shadowColor = nil;
+        self.tintColor = UIColor.blackColor;
+        self.selectedTintColor = UIColor.blackColor;
+        self.selectedBackgroundColor = UIColor.whiteColor;
+        self.supportedToolbarPositions = PSPDFFlexibleToolbarPositionInTopBar;
     }
 
     return self;
 }
+
+// - (UIButton*)doneButton {
+//     return nil;
+// }
 
 @end

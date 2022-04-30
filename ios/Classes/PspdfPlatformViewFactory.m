@@ -32,7 +32,7 @@
 
 // Required to pass the arguments to UiKitView.
 - (NSObject<FlutterMessageCodec> *)createArgsCodec {
-  return [FlutterStandardMessageCodec sharedInstance];
+    return [FlutterStandardMessageCodec sharedInstance];
 }
 
 @end
