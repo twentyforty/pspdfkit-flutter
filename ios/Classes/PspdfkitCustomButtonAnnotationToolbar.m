@@ -9,9 +9,6 @@
         self.tintColor =  UIColor.whiteColor;
         self.editableAnnotationTypes = [NSSet setWithArray:@[PSPDFAnnotationStringHighlight, PSPDFAnnotationStringInk, PSPDFAnnotationStringEraser/*, PSPDFAnnotationStringFreeText*/]];
         self.configurations = @[[[PSPDFAnnotationToolbarConfiguration alloc] initWithAnnotationGroups:@[
-            /*[PSPDFAnnotationGroup groupWithItems:@[
-                [PSPDFAnnotationGroupItem itemWithType:PSPDFAnnotationStringFreeText variant:NULL configurationBlock: [PSPDFAnnotationGroupItem freeTextConfigurationBlock]]
-            ]],*/
             [PSPDFAnnotationGroup groupWithItems:@[
                 [PSPDFAnnotationGroupItem itemWithType:PSPDFAnnotationStringHighlight]
             ]],
@@ -21,10 +18,6 @@
             [PSPDFAnnotationGroup groupWithItems:@[
                 [PSPDFAnnotationGroupItem itemWithType:PSPDFAnnotationStringInk variant:PSPDFAnnotationVariantStringInkPen configurationBlock:[PSPDFAnnotationGroupItem inkConfigurationBlock]]
             ]],
-            [PSPDFAnnotationGroup groupWithItems:@[
-                [PSPDFAnnotationGroupItem itemWithType:PSPDFAnnotationStringEraser]    
-            ]],
-            
         ]]];
         self.standardAppearance = [[UIToolbarAppearance alloc] init];
         [self.standardAppearance configureWithOpaqueBackground];

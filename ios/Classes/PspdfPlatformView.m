@@ -104,21 +104,21 @@
                         object:nil
                          queue:nil
                     usingBlock:^(NSNotification *notification) {
-            [PspdfkitPlugin userAnnotationAdded];
+            [PspdfkitPlugin userAnnotationsChanged];
         }];
         self.annotationsRemovedObserver = [[NSNotificationCenter defaultCenter] 
             addObserverForName:PSPDFAnnotationsRemovedNotification
                         object:nil
                          queue:nil
                     usingBlock:^(NSNotification *notification) {
-            [PspdfkitPlugin userAnnotationRemoved];
+            [PspdfkitPlugin userAnnotationsChanged];
         }];
         self.annotationChangedObserver = [[NSNotificationCenter defaultCenter] 
             addObserverForName:PSPDFAnnotationChangedNotification
                         object:nil
                          queue:nil
                     usingBlock:^(NSNotification *notification) {
-            [PspdfkitPlugin userAnnotationChanged];
+            [PspdfkitPlugin userAnnotationsChanged];
         }];
     } else {
         _pdfViewController = [[PSPDFViewController alloc] init];

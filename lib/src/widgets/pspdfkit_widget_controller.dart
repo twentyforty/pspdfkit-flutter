@@ -59,6 +59,9 @@ class PspdfkitWidgetController {
   Future<dynamic> getAllUnsavedAnnotations() async =>
       _channel.invokeMethod<dynamic>('getAllUnsavedAnnotations');
 
+  Future<dynamic> getAllAnnotations() async =>
+      _channel.invokeMethod<dynamic>('getAllAnnotations');
+
   /// Processes annotations of the given type with the provided processing
   /// mode and stores the PDF at the given destination path.
   Future<bool?> processAnnotations(

@@ -79,6 +79,8 @@
         result([PspdfkitFlutterHelper getAnnotationsForPageIndex:pageIndex andType:typeString forViewController:pdfViewController]);
     } else if ([@"getAllUnsavedAnnotations" isEqualToString:call.method]) {
         result([PspdfkitFlutterHelper getAllUnsavedAnnotationsForViewController:pdfViewController]);
+    } else if ([@"getAllAnnotations" isEqualToString:call.method]) {
+        result([PspdfkitFlutterHelper getAllAnnotationsForViewController:pdfViewController]);
     } else if ([@"importXfdf" isEqualToString:call.method]) {
         NSString *path = call.arguments[@"xfdfPath"];
         result([PspdfkitFlutterHelper importXFDFFromPath:path forViewController:pdfViewController]);
@@ -459,6 +461,29 @@
     PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
     NSData *data = [document generateInstantJSONFromDocumentProvider:documentProvider error:NULL];
     NSDictionary *annotationsJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL];
+
+    if (annotationsJSON) {
+        return annotationsJSON;
+    }  else {
+        return [FlutterError errorWithCode:@"" message:@"Failed to get annotations." details:nil];
+    }
+}
+
++ (id)getAllAnnotationsForViewController:(PSPDFViewController *)pdfViewController {
+    PSPDFDocument *document = pdfViewController.document;
+    if (!document || !document.isValid) {
+        return [FlutterError errorWithCode:@"" message:@"PDF document not found or is invalid." details:nil];
+    }
+    int pageCount = document.pageCount;
+    
+    NSMutableArray *allAnnotations = [[NSMutableArray alloc] init];
+    for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+        NSArray <PSPDFAnnotation *> *annotations = [document annotationsForPageAtIndex:pageIndex type:PSPDFAnnotationTypeAll];
+        if (annotations != nil) {
+            [allAnnotations addObjectsFromArray:annotations];
+        }
+    }
+    NSArray <NSDictionary *> *annotationsJSON = [PspdfkitFlutterConverter instantJSONFromAnnotations:allAnnotations];
 
     if (annotationsJSON) {
         return annotationsJSON;

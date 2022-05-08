@@ -77,13 +77,8 @@ PSPDFSettingKey const PSPDFSettingKeyHybridEnvironment = @"com.pspdfkit.hybrid-e
 
 # pragma mark - Annotation notifications
 
-+ (void)userAnnotationAdded {
-    [channel invokeMethod:@"userAnnotationAdded" arguments:nil];
-}
-+ (void)userAnnotationRemoved {
-    [channel invokeMethod:@"userAnnotationRemoved" arguments:nil];
-}
-+ (void)userAnnotationChanged {
-    [channel invokeMethod:@"userAnnotationChanged" arguments:nil];
+
++ (void)userAnnotationsChanged {
+    [channel invokeMethod:@"userAnnotationsChanged" arguments:nil];
 }
 @end

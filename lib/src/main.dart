@@ -188,9 +188,7 @@ class Pspdfkit {
   static late VoidCallback pdfViewControllerWillDismiss;
   static late VoidCallback pdfViewControllerDidDismiss;
   static late void Function(dynamic) spreadIndexDidChange;
-  static late VoidCallback? userAnnotationAdded;
-  static late VoidCallback? userAnnotationRemoved;
-  static late VoidCallback? userAnnotationChanged;
+  static late VoidCallback? userAnnotationsChanged;
 
   static Future<void> _platformCallHandler(MethodCall call) {
     try {
@@ -207,19 +205,9 @@ class Pspdfkit {
         case 'spreadIndexDidChange':
           spreadIndexDidChange(call.arguments);
           break;
-        case 'userAnnotationAdded':
-          if (userAnnotationAdded != null) {
-            userAnnotationAdded!();
-          }
-          break;
-        case 'userAnnotationRemoved':
-          if (userAnnotationRemoved != null) {
-            userAnnotationRemoved!();
-          }
-          break;
-        case 'userAnnotationChanged':
-          if (userAnnotationChanged != null) {
-            userAnnotationChanged!();
+        case 'userAnnotationsChanged':
+          if (userAnnotationsChanged != null) {
+            userAnnotationsChanged!();
           }
           break;
         default:
