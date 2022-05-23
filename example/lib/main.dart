@@ -350,8 +350,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void manualSaveExample() async {
-    final extractedWritableDocument =
-        await extractAsset(_documentPath, shouldOverwrite: false, prefix: 'persist');
+    final extractedWritableDocument = await extractAsset(_documentPath,
+        shouldOverwrite: false, prefix: 'persist');
 
     // Automatic Saving of documents is enabled by default in certain scenarios [see for details: https://pspdfkit.com/guides/flutter/save-a-document/#auto-save]
     // In order to manually save documents, you might consider disabling automatic saving with disableAutosave: true in the config
@@ -546,20 +546,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     initPlatformState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangePlatformBrightness() {
     currentTheme =
-        WidgetsBinding.instance?.window.platformBrightness == Brightness.light
+        WidgetsBinding.instance.window.platformBrightness == Brightness.light
             ? lightTheme
             : darkTheme;
     setState(() {
@@ -630,7 +630,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         () => pdfViewControllerWillDismissHandler();
     Pspdfkit.pdfViewControllerDidDismiss =
         () => pdfViewControllerDidDismissHandler();
-    Pspdfkit.spreadIndexDidChange = (dynamic arguments) => spreadIndexDidChangeHandler(arguments);
+    Pspdfkit.spreadIndexDidChange =
+        (dynamic arguments) => spreadIndexDidChangeHandler(arguments);
 
     currentTheme = MediaQuery.of(context).platformBrightness == Brightness.light
         ? lightTheme
