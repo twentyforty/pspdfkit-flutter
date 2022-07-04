@@ -1,5 +1,18 @@
 ## Newest Release
 
+### 3.2.2 - 16 Mar 2022
+
+- Improves the example project by using the `PlatformUtils` class to check for supported platforms (#33212)
+- Adds a new **Save As** example to the example project. (#33376)
+- Updates for PSPDFKit 11.3.0 for iOS. (#33514)
+
+## Previous Releases
+
+### 3.2.1 - 04 Mar 2022
+
+- Updates for PSPDFKit 8.1.2 for Android. (#33314)
+- Updates for PSPDFKit 11.2.4 for iOS. (#33314)
+
 ### 3.2.0 - 14 Feb 2022
 
 - This release requires you to update your Android project's `compileSdkVersion` to version 31. Please refer to [our migration guide](https://pspdfkit.com/guides/flutter/migration-guides/flutter-3-2-0-migration-guide) for this release.
@@ -8,8 +21,6 @@
 - Adds a new example illustrating manual saving of documents with autosave disabled. (#32857)
 - Updates for PSPDFKit 8.1.1 for Android. (#33016)
 - Updates for PSPDFKit 11.2.2 for iOS. (#33016)
-
-## Previous Releases
 
 ### 3.1.0 - 06 Jan 2022
 

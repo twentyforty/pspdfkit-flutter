@@ -92,6 +92,10 @@
         NSString *processingMode = call.arguments[@"processingMode"];
         NSString *destinationPath = call.arguments[@"destinationPath"];
         result([PspdfkitFlutterHelper processAnnotationsOfType:type withProcessingMode:processingMode andDestinationPath:destinationPath forViewController:pdfViewController]);
+    } else if ([@"goToPage" isEqualToString:call.method]) {
+        PSPDFPageIndex pageIndex = [call.arguments[@"pageIndex"] longLongValue];
+        [pdfViewController setPageIndex:pageIndex animated:NO];
+        
     } else {
         result(FlutterMethodNotImplemented);
     }
