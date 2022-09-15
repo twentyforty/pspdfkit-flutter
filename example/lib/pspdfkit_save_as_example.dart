@@ -120,7 +120,9 @@ class _PspdfkitSaveAsExampleWidgetState
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
                                 title: const Text('Document Saved!'),
-                                content: Text('Document Saved Successfully at ' + newDocumentPath),
+                                content: Text(
+                                    'Document Saved Successfully at ' +
+                                        newDocumentPath),
                                 actions: <Widget>[
                                   TextButton(
                                     onPressed: () =>

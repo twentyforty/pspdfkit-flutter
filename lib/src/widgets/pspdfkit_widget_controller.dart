@@ -56,7 +56,8 @@ class PspdfkitWidgetController {
           <String, dynamic>{'pageIndex': pageIndex, 'type': type});
 
   Future<dynamic> goToPage(int pageIndex) async =>
-      _channel.invokeMethod<dynamic>('goToPage', <String, dynamic>{'pageIndex': pageIndex});
+      _channel.invokeMethod<dynamic>(
+          'goToPage', <String, dynamic>{'pageIndex': pageIndex});
 
   /// Returns a list of JSON dictionaries for all the unsaved annotations in the presented document.
   Future<dynamic> getAllUnsavedAnnotations() async =>
