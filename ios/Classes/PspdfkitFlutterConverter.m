@@ -260,6 +260,7 @@
     return thumbnailBarMode;
 }
 
+
 + (PSPDFAppearanceMode)appearanceMode:(NSDictionary *)dictionary {
     if ((id)dictionary == NSNull.null || !dictionary || dictionary.count == 0) {
         return PSPDFAppearanceModeDefault;

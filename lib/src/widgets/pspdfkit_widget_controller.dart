@@ -84,15 +84,11 @@ class PspdfkitWidgetController {
   Future<bool?> exportXfdf(String xfdfPath) async => _channel
       .invokeMethod('exportXfdf', <String, String>{'xfdfPath': xfdfPath});
 
-  Future<bool?> showAnnotationBar() async =>
-      _channel.invokeMethod('showAnnotationBar');
+  Future<bool?> isAnnotationToolbarVisible() async =>
+      _channel.invokeMethod('isAnnotationToolbarVisible');
 
-  Future<bool?> hideAnnotationBar() async =>
-      _channel.invokeMethod('hideAnnotationBar');
-
-  Future<bool?> showGallery() async => _channel.invokeMethod('showGallery');
-
-  Future<bool?> hideGallery() async => _channel.invokeMethod('hideGallery');
+  Future<void> toggleAnnotationToolbarVisible() async =>
+      _channel.invokeMethod('toggleAnnotationToolbarVisible');
 
   /// Saves the document back to its original loc
   /// ation if it has been changed.

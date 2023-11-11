@@ -11,6 +11,8 @@
 #import "PspdfkitFlutterConverter.h"
 #import "PspdfkitPlugin.h"
 #import "PspdfkitCustomButtonAnnotationToolbar.h"
+#import "CQAPspdfkitThumbnailViewController.h"
+
 @import PSPDFKit;
 @import PSPDFKitUI;
 
@@ -47,12 +49,17 @@
 
     UINavigationBarAppearance* appearance = [[UINavigationBarAppearance alloc] init];
     [appearance configureWithOpaqueBackground];
-    appearance.backgroundColor = [UIColor colorWithRed:91.0/255.0 green:129.0/255.0 blue:74.0/255.0 alpha:1.0];
-    appearance.shadowColor = nil;
+
+    if (self.view.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+        appearance.backgroundColor = [UIColor colorWithRed:33.0/255.0 green:33.0/255.0 blue:33.0/255.0 alpha:1.0];
+        _navigationController.navigationBar.tintColor = UIColor.whiteColor;
+    } else {
+        appearance.backgroundColor = [UIColor colorWithRed:245.0/255.0 green:245.0/255.0 blue:245.0/255.0 alpha:1.0];
+        _navigationController.navigationBar.tintColor = UIColor.blackColor;
+    }
 
     _navigationController.navigationBar.standardAppearance = appearance;
-    _navigationController.navigationBar.scrollEdgeAppearance = appearance;
-    _navigationController.navigationBar.tintColor = UIColor.blackColor;
+    _navigationController.navigationBar.scrollEdgeAppearance = appearance;    
 
     // View controller containment
     _flutterViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
@@ -75,7 +82,7 @@
         // Update the configuration to override the default class with our custom one.
         configuration = [configuration configurationUpdatedWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
             [builder overrideClass:PSPDFAnnotationToolbar.class withClass:PspdfkitCustomButtonAnnotationToolbar.class];
-            [builder overrideClass:PSPDFAnnotationToolbar.class withClass:PspdfkitCustomButtonAnnotationToolbar.class];
+            [builder overrideClass:PSPDFViewController.class withClass:PspdfkitCustomViewController.class];
         }];
 
         _pdfViewController = [[PSPDFViewController alloc] initWithDocument:document configuration:configuration];
@@ -124,6 +131,7 @@
         _pdfViewController = [[PSPDFViewController alloc] init];
     }
     [_navigationController setViewControllers:@[_pdfViewController] animated:NO];
+    [_navigationController setNavigationBarHidden:YES animated:NO];
 
     self = [super init];
 

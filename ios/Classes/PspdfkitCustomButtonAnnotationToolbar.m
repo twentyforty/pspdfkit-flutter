@@ -21,19 +21,43 @@
         ]]];
         self.standardAppearance = [[UIToolbarAppearance alloc] init];
         [self.standardAppearance configureWithOpaqueBackground];
-        self.standardAppearance.backgroundColor = [UIColor colorWithRed:91.0/255.0 green:129.0/255.0 blue:74.0/255.0 alpha:1.0];
         self.standardAppearance.shadowColor = nil;
-        self.tintColor = UIColor.blackColor;
-        self.selectedTintColor = UIColor.blackColor;
-        self.selectedBackgroundColor = UIColor.whiteColor;
+
+        if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleLight) {
+            self.standardAppearance.backgroundColor = [UIColor colorWithRed:245.0/255.0 green:245.0/255.0 blue:245.0/255.0 alpha:1.0];
+            self.tintColor = UIColor.blackColor;
+            self.selectedTintColor = UIColor.blackColor;
+            self.selectedBackgroundColor = UIColor.whiteColor;
+        } else {
+            self.standardAppearance.backgroundColor = [UIColor colorWithRed:33.0/255.0 green:33.0/255.0 blue:33.0/255.0 alpha:1.0];
+            self.tintColor = UIColor.whiteColor;
+            self.selectedTintColor = UIColor.whiteColor;
+            self.selectedBackgroundColor = UIColor.blackColor;
+        }
+
         self.supportedToolbarPositions = PSPDFFlexibleToolbarPositionInTopBar;
     }
 
     return self;
 }
 
-// - (UIButton*)doneButton {
-//     return nil;
-// }
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleLight) {
+        self.standardAppearance.backgroundColor = [UIColor colorWithRed:245.0/255.0 green:245.0/255.0 blue:245.0/255.0 alpha:1.0];
+        self.tintColor = UIColor.blackColor;
+        self.selectedTintColor = UIColor.blackColor;
+        self.selectedBackgroundColor = UIColor.whiteColor;
+    } else {
+        self.standardAppearance.backgroundColor = [UIColor colorWithRed:33.0/255.0 green:33.0/255.0 blue:33.0/255.0 alpha:1.0];
+        self.tintColor = UIColor.whiteColor;
+        self.selectedTintColor = UIColor.whiteColor;
+        self.selectedBackgroundColor = UIColor.blackColor;
+    }
+}
+
+- (UIButton*)doneButton {
+    return nil;
+}
 
 @end

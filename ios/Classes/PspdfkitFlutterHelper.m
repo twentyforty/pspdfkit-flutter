@@ -95,7 +95,15 @@
     } else if ([@"goToPage" isEqualToString:call.method]) {
         PSPDFPageIndex pageIndex = [call.arguments[@"pageIndex"] longLongValue];
         [pdfViewController setPageIndex:pageIndex animated:NO];
-        
+    } else if ([@"isAnnotationToolbarVisible" isEqualToString:call.method]) {
+        bool isVisible = pdfViewController.annotationToolbarController.annotationToolbar.window == nil;
+        result(@(isVisible));
+    } else if ([@"toggleAnnotationToolbarVisible" isEqualToString:call.method]) {
+        if (pdfViewController.annotationToolbarController.annotationToolbar.window == nil) {
+            [pdfViewController annotationButtonPressed:nil];
+        } else {
+            [pdfViewController.annotationToolbarController.annotationToolbar done:nil];
+        }
     } else {
         result(FlutterMethodNotImplemented);
     }
